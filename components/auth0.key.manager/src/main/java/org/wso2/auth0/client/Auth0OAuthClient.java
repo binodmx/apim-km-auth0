@@ -26,6 +26,7 @@ import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
 import feign.okhttp.OkHttpClient;
 import feign.slf4j.Slf4jLogger;
+import feign.Logger.Level;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -321,7 +322,7 @@ public class Auth0OAuthClient extends AbstractKeyManager {
         configuration = keyManagerConfiguration;
         auth0TokenClient = Feign.builder().client(new OkHttpClient()).encoder(new FormEncoder())
                 .decoder(new GsonDecoder()).errorDecoder(new ErrorDecoder.Default())
-                .logger(new Slf4jLogger()).target(Auth0TokenClient.class,
+                .logger(new Slf4jLogger(Auth0OAuthClient.class)).logLevel(Level.FULL).target(Auth0TokenClient.class,
                         (String) keyManagerConfiguration.getParameter(APIConstants.KeyManager.TOKEN_ENDPOINT));
         Auth0APIKeyInterceptor auth0APIKeyInterceptor = new Auth0APIKeyInterceptor(auth0TokenClient,
                 (String) keyManagerConfiguration.getParameter(Auth0Constants.CLIENT_ID),
@@ -333,12 +334,12 @@ public class Auth0OAuthClient extends AbstractKeyManager {
                 ((String) keyManagerConfiguration.getParameter(Auth0Constants.AUDIENCE)).concat("client-grants");
         auth0DCRClient = Feign.builder().client(new OkHttpClient()).encoder(new GsonEncoder())
                 .decoder(new GsonDecoder()).errorDecoder(new ErrorDecoder.Default())
-                .logger(new Slf4jLogger()).requestInterceptor(auth0APIKeyInterceptor)
-                .target(Auth0DCRClient.class, clientRegistrationEndpoint);
+                .logger(new Slf4jLogger(Auth0OAuthClient.class)).logLevel(Level.FULL)
+                .requestInterceptor(auth0APIKeyInterceptor).target(Auth0DCRClient.class, clientRegistrationEndpoint);
         auth0ClientGrant = Feign.builder().client(new OkHttpClient()).encoder(new GsonEncoder())
                 .decoder(new GsonDecoder()).errorDecoder(new ErrorDecoder.Default())
-                .logger(new Slf4jLogger()).requestInterceptor(auth0APIKeyInterceptor)
-                .target(Auth0ClientGrant.class, clientGrantEndpoint);
+                .logger(new Slf4jLogger(Auth0OAuthClient.class)).logLevel(Level.FULL)
+                .requestInterceptor(auth0APIKeyInterceptor).target(Auth0ClientGrant.class, clientGrantEndpoint);
     }
 
     @Override
